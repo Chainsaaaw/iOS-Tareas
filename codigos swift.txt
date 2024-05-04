@@ -1,0 +1,218 @@
+Parte 1
+
+import Foundation
+
+class Human: CustomStringConvertible, Equatable, Comparable, Codable {
+    var name: String
+    var age: Int
+    
+    init(name: String, age: Int) {
+        self.name = name
+        self.age = age
+    }
+    
+    var description: String {
+        return "\(name), \(age) years old"
+    }
+    
+    static func == (lhs: Human, rhs: Human) -> Bool {
+        return lhs.name == rhs.name && lhs.age == rhs.age
+    }
+    
+    static func < (lhs: Human, rhs: Human) -> Bool {
+        return lhs.age < rhs.age
+    }
+}
+
+// Initializing Human instances
+let human1 = Human(name: "Alice", age: 30)
+let human2 = Human(name: "Bob", age: 25)
+
+// Printing Human objects using CustomStringConvertible
+print(human1)
+print(human2)
+
+// Checking equality using Equatable
+let areEqual = human1 == human2
+let areNotEqual = human1 != human2
+print("Are equal:", areEqual)
+print("Are not equal:", areNotEqual)
+
+// Sorting Humans based on age using Comparable
+let human3 = Human(name: "Charlie", age: 35)
+let human4 = Human(name: "David", age: 20)
+let human5 = Human(name: "Eve", age: 28)
+
+let people: [Human] = [human1, human2, human3, human4, human5]
+let sortedPeople = people.sorted()
+
+print("Sorted people:")
+for person in sortedPeople {
+    print(person)
+}
+
+// Encoding one Human object using Codable
+let encoder = JSONEncoder()
+if let encodedData = try? encoder.encode(human1),
+   let jsonString = String(data: encodedData, encoding: .utf8) {
+    print("Encoded Human object as JSON string:", jsonString)
+}
+
+Parte 2
+
+import Foundation
+
+class Workout: CustomStringConvertible, Equatable, Comparable, Codable {
+    var distance: Double
+    var time: Double
+    var identifier: Int
+    
+    init(distance: Double, time: Double, identifier: Int) {
+        self.distance = distance
+        self.time = time
+        self.identifier = identifier
+    }
+    
+    var description: String {
+        return "Workout \(identifier): Distance - \(distance) km, Time - \(time) mins"
+    }
+    
+    static func == (lhs: Workout, rhs: Workout) -> Bool {
+        return lhs.identifier == rhs.identifier
+    }
+    
+    static func < (lhs: Workout, rhs: Workout) -> Bool {
+        return lhs.identifier < rhs.identifier
+    }
+}
+
+// Step 1: CustomStringConvertible
+let workout1 = Workout(distance: 5.0, time: 30.0, identifier: 1)
+print(workout1)
+
+// Step 2: Equatable
+let workout2 = Workout(distance: 7.5, time: 45.0, identifier: 2)
+let areEqual = workout1 == workout2
+print("Are workouts equal:", areEqual)
+
+// Step 3: Comparable
+let workout3 = Workout(distance: 3.0, time: 20.0, identifier: 3)
+let workout4 = Workout(distance: 6.0, time: 40.0, identifier: 4)
+let workout5 = Workout(distance: 4.5, time: 25.0, identifier: 5)
+
+let workouts: [Workout] = [workout3, workout5, workout2, workout4, workout1]
+let sortedWorkouts = workouts.sorted()
+
+print("Sorted workouts:")
+for workout in sortedWorkouts {
+    print(workout)
+}
+
+// Step 4: Codable
+let encoder = JSONEncoder()
+if let encodedData = try? encoder.encode(workout1),
+   let jsonString = String(data: encodedData, encoding: .utf8) {
+    print("Encoded Workout object as JSON string:", jsonString)
+}
+
+Parte 3
+
+protocol Vehicle {
+    var numberOfWheels: Int { get }
+    func drive()
+}
+
+struct Car: Vehicle {
+    let numberOfWheels: Int = 4
+    
+    func drive() {
+        print("Vroom, vroom!")
+    }
+}
+
+struct Bike: Vehicle {
+    let numberOfWheels: Int = 2
+    
+    func drive() {
+        print("Begin pedaling!")
+    }
+}
+
+let car = Car()
+print("Number of wheels on the car:", car.numberOfWheels)
+car.drive()
+
+let bike = Bike()
+print("Number of wheels on the bike:", bike.numberOfWheels)
+bike.drive()
+
+Parte 4
+
+protocol Workout {
+    var distance: Double { get set }
+    var time: Double { get set }
+}
+
+struct RunningWorkout: Workout {
+    var distance: Double
+    var time: Double
+}
+
+struct SwimmingWorkout: Workout {
+    var distance: Double
+    var time: Double
+}
+
+func simpleWorkoutDescription(workout: Workout) {
+    print("You went \(workout.distance) meters in \(workout.time) seconds.")
+}
+
+let running = RunningWorkout(distance: 5000, time: 1500)
+let swimming = SwimmingWorkout(distance: 1000, time: 1200)
+
+simpleWorkoutDescription(workout: running)
+simpleWorkoutDescription(workout: swimming)
+
+Parte 5
+
+protocol HeartRateReceiverDelegate {
+    func heartRateUpdated(to bpm: Int)
+}
+
+class HeartRateReceiver {
+    var delegate: HeartRateReceiverDelegate?
+    
+    var currentHR: Int? {
+        didSet {
+            if let currentHR = currentHR {
+                print("The most recent heart rate reading is \(currentHR).")
+                delegate?.heartRateUpdated(to: currentHR)
+            } else {
+                print("Looks like we can't pick up a heart rate.")
+            }
+        }
+    }
+
+    func startHeartRateMonitoringExample() {
+        for _ in 1...10 {
+            let randomHR = 60 + Int(arc4random_uniform(UInt32(15)))
+            currentHR = randomHR
+            Thread.sleep(forTimeInterval: 2)
+        }
+    }
+}
+
+class HeartRateViewController: UIViewController, HeartRateReceiverDelegate {
+    var heartRateLabel: UILabel = UILabel()
+    
+    func heartRateUpdated(to bpm: Int) {
+        heartRateLabel.text = "Heart Rate: \(bpm)"
+        print("The user has been shown a heart rate of \(bpm).")
+    }
+}
+
+// Create an instance of HeartRateReceiver and call startHeartRateMonitoringExample
+let heartRateReceiver = HeartRateReceiver()
+let heartRateViewController = HeartRateViewController()
+heartRateReceiver.delegate = heartRateViewController
+heartRateReceiver.startHeartRateMonitoringExample()
